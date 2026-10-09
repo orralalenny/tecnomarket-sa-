@@ -1,0 +1,3114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TecnoMarket S.A. | Dashboard SGSI</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #0f172a;
+        }
+
+        .font-number {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .sidebar-active {
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            color: white !important;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, .22);
+        }
+
+        .nav-btn {
+            position: relative;
+            transition: all .25s ease;
+        }
+
+        .nav-btn:hover:not(.sidebar-active) {
+            background: rgba(255,255,255,.07);
+            transform: translateX(3px);
+        }
+
+        .glass {
+            background: rgba(255,255,255,.86);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(15, 23, 42, .045);
+            transition: all .25s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 14px 32px rgba(15, 23, 42, .08);
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            font-size: .78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #0f172a;
+        }
+
+        .tab-content {
+            animation: fadeIn .3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(7px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .kpi-number {
+            font-size: 2rem;
+            line-height: 1;
+            font-weight: 800;
+        }
+
+        .risk-cell {
+            min-height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+
+        .risk-cell:hover {
+            transform: scale(1.04);
+            filter: brightness(.97);
+            z-index: 2;
+        }
+
+        .table-row:hover {
+            background: #f8fafc;
+        }
+
+        .modal-bg {
+            animation: modalBg .2s ease;
+        }
+
+        .modal-card {
+            animation: modalIn .25s ease;
+        }
+
+        @keyframes modalBg {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(.97);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .scrollbar::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        .scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 20px;
+        }
+
+        @media (max-width: 767px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .mobile-overlay {
+                display: block;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .mobile-overlay {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- OVERLAY MÓVIL -->
+<div id="mobile-overlay"
+     onclick="toggleMobileSidebar()"
+     class="mobile-overlay hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-30">
+</div>
+
+<div class="min-h-screen flex">
+
+    <!-- ========================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ========================================================= -->
+    <aside id="sidebar"
+        class="fixed md:sticky top-0 left-0 z-40 w-72 h-screen bg-[#0b1220] text-white border-r border-slate-800 flex flex-col justify-between transition-transform duration-300 shadow-2xl">
+
+        <div class="overflow-y-auto scrollbar">
+
+            <!-- LOGO / HEADER -->
+            <div class="p-5 border-b border-white/10">
+                <div class="flex items-center justify-between">
+
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
+                            <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+                        </div>
+
+                        <div>
+                            <span class="text-[9px] font-bold tracking-widest text-sky-400 uppercase">
+                                SGSI · ISO/IEC 27001
+                            </span>
+                            <h1 class="font-extrabold text-white text-sm mt-0.5">
+                                TecnoMarket S.A.
+                            </h1>
+                        </div>
+                    </div>
+
+                    <button onclick="toggleMobileSidebar()"
+                        class="md:hidden text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <div class="mt-4 p-3 rounded-xl bg-white/5 border border-white/10">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                        <span class="text-[10px] font-semibold text-slate-300">
+                            Sistema operativo
+                        </span>
+                    </div>
+                    <p class="text-[10px] text-slate-500 mt-1">
+                        Dashboard de Seguridad y Gestión de Riesgos
+                    </p>
+                </div>
+            </div>
+
+            <!-- NAVEGACIÓN -->
+            <nav class="p-4 space-y-1.5">
+
+                <p class="px-3 mb-2 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                    Navegación principal
+                </p>
+
+                <button onclick="switchTab('bienvenida')" id="btn-bienvenida"
+                    class="nav-btn sidebar-active w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-xs font-semibold">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Dashboard principal</span>
+                </button>
+
+                <button onclick="switchTab('empresa')" id="btn-empresa"
+                    class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-xs font-semibold text-slate-300">
+                    <i data-lucide="building-2" class="w-4 h-4"></i>
+                    <span>Empresa y activos</span>
+                </button>
+
+                <button onclick="switchTab('seguridad')" id="btn-seguridad"
+                    class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-xs font-semibold text-slate-300">
+                    <i data-lucide="shield" class="w-4 h-4"></i>
+                    <span>Seguridad de la información</span>
+                </button>
+
+                <button onclick="switchTab('iso')" id="btn-iso"
+                    class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-xs font-semibold text-slate-300">
+                    <i data-lucide="badge-check" class="w-4 h-4"></i>
+                    <span>ISO/IEC 27001</span>
+                </button>
+
+                <button onclick="switchTab('riesgos')" id="btn-riesgos"
+                    class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-xs font-semibold text-slate-300">
+                    <i data-lucide="triangle-alert" class="w-4 h-4"></i>
+                    <span>Gestión de riesgos</span>
+                </button>
+
+                <button onclick="switchTab('plan')" id="btn-plan"
+                    class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-xs font-semibold text-slate-300">
+                    <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+                    <span>Plan de acción</span>
+                </button>
+
+                <div class="pt-5">
+                    <p class="px-3 mb-2 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                        Indicadores
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-2">
+
+                        <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                            <p class="text-[9px] text-slate-500 uppercase">Riesgos</p>
+                            <p class="text-lg font-extrabold text-white font-number">10</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                            <p class="text-[9px] text-slate-500 uppercase">Activos</p>
+                            <p class="text-lg font-extrabold text-white font-number">07</p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </nav>
+        </div>
+
+        <!-- FOOTER SIDEBAR -->
+        <div class="p-4 border-t border-white/10 bg-black/10">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+                    <i data-lucide="graduation-cap" class="w-4 h-4 text-sky-400"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-white">
+                        UNEMI · Carrera de TI
+                    </p>
+                    <p class="text-[9px] text-slate-500 mt-0.5">
+                        Evaluación de Seguridad
+                    </p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+
+    <!-- ========================================================= -->
+    <!-- CONTENIDO PRINCIPAL -->
+    <!-- ========================================================= -->
+    <div class="flex-1 min-w-0 flex flex-col">
+
+        <!-- TOPBAR -->
+        <header class="sticky top-0 z-20 glass border-b border-slate-200">
+
+            <div class="px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+
+                <div class="flex items-center gap-3 min-w-0">
+
+                    <button onclick="toggleMobileSidebar()"
+                        class="md:hidden w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="hidden sm:inline-flex w-2 h-2 bg-emerald-500 rounded-full"></span>
+                            <h2 id="section-title"
+                                class="text-sm sm:text-base font-extrabold text-slate-900 truncate">
+                                Dashboard principal
+                            </h2>
+                        </div>
+
+                        <p id="section-subtitle"
+                           class="text-[10px] sm:text-xs text-slate-500 truncate">
+                            Sistema de Gestión de Seguridad de la Información
+                        </p>
+                    </div>
+                </div>
+
+                <div class="hidden sm:flex items-center gap-2">
+
+                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl">
+                        <i data-lucide="users" class="w-3.5 h-3.5 text-slate-500"></i>
+                        <span class="text-[10px] font-bold text-slate-700">
+                            60 colaboradores
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2 px-3 py-2 bg-sky-50 border border-sky-200 rounded-xl">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-sky-600"></i>
+                        <span class="text-[10px] font-bold text-sky-700">
+                            ISO 27001:2022
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+        </header>
+
+
+        <!-- ===================================================== -->
+        <!-- MAIN -->
+        <!-- ===================================================== -->
+        <main class="w-full max-w-[1500px] mx-auto p-4 sm:p-6 lg:p-8 space-y-5 flex-1">
+
+
+            <!-- ================================================= -->
+            <!-- DASHBOARD -->
+            <!-- ================================================= -->
+            <section id="tab-bienvenida" class="tab-content space-y-5">
+
+                <!-- HERO -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-blue-950 to-sky-900 text-white p-6 sm:p-8 shadow-xl">
+
+                    <div class="absolute -right-24 -top-24 w-72 h-72 bg-sky-400/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -left-20 -bottom-28 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
+
+                    <div class="relative z-10 max-w-4xl">
+
+                        <div class="flex flex-wrap items-center gap-2 mb-4">
+
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[9px] font-bold uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>
+                                Portal SGSI
+                            </span>
+
+                            <span class="px-3 py-1 rounded-full bg-sky-400/15 border border-sky-300/20 text-[9px] font-bold text-sky-200">
+                                UNEMI · 2026
+                            </span>
+
+                        </div>
+
+                        <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                            Seguridad de la Información
+                            <span class="text-sky-300">y Gestión de Riesgos</span>
+                        </h1>
+
+                        <p class="mt-4 max-w-3xl text-sm text-slate-300 leading-relaxed">
+                            Dashboard interactivo de <strong class="text-white">TecnoMarket S.A.</strong>
+                            para visualizar la situación de seguridad de la información,
+                            activos tecnológicos, riesgos, controles y acciones de mitigación.
+                        </p>
+
+                        <div class="flex flex-wrap gap-3 mt-6">
+
+                            <button onclick="switchTab('riesgos')"
+                                class="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-lg shadow-sky-950/30">
+                                <i data-lucide="triangle-alert" class="w-4 h-4"></i>
+                                Ver riesgos
+                            </button>
+
+                            <button onclick="switchTab('empresa')"
+                                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/15 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition">
+                                <i data-lucide="building-2" class="w-4 h-4"></i>
+                                Conocer la empresa
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- KPIs -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+
+                    <div class="card p-5 border-l-4 border-l-sky-500">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                                    Organización
+                                </p>
+                                <h3 class="text-sm font-bold text-slate-900 mt-1">
+                                    TecnoMarket S.A.
+                                </h3>
+                                <p class="text-[11px] text-slate-500 mt-1">
+                                    9 áreas de trabajo
+                                </p>
+                            </div>
+
+                            <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center">
+                                <i data-lucide="building-2" class="w-5 h-5 text-sky-600"></i>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 flex items-end justify-between">
+                            <span class="kpi-number text-sky-600 font-number">60</span>
+                            <span class="text-[10px] font-bold text-slate-400">COLABORADORES</span>
+                        </div>
+                    </div>
+
+
+                    <div class="card p-5 border-l-4 border-l-emerald-500">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                                    Activos clave
+                                </p>
+                                <h3 class="text-sm font-bold text-slate-900 mt-1">
+                                    Inventario SGSI
+                                </h3>
+                                <p class="text-[11px] text-slate-500 mt-1">
+                                    Datos, software e infraestructura
+                                </p>
+                            </div>
+
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                                <i data-lucide="database" class="w-5 h-5 text-emerald-600"></i>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 flex items-end justify-between">
+                            <span class="kpi-number text-emerald-600 font-number">07</span>
+                            <span class="text-[10px] font-bold text-slate-400">ACTIVOS</span>
+                        </div>
+                    </div>
+
+
+                    <div class="card p-5 border-l-4 border-l-rose-500">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                                    Riesgos evaluados
+                                </p>
+                                <h3 class="text-sm font-bold text-slate-900 mt-1">
+                                    Matriz 5 × 5
+                                </h3>
+                                <p class="text-[11px] text-slate-500 mt-1">
+                                    3 críticos · 6 altos · 1 medio
+                                </p>
+                            </div>
+
+                            <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center">
+                                <i data-lucide="triangle-alert" class="w-5 h-5 text-rose-600"></i>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 flex items-end justify-between">
+                            <span class="kpi-number text-rose-600 font-number">10</span>
+                            <span class="text-[10px] font-bold text-slate-400">RIESGOS</span>
+                        </div>
+                    </div>
+
+
+                    <div class="card p-5 border-l-4 border-l-amber-500">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-wider font-bold text-slate-500">
+                                    Continuidad
+                                </p>
+                                <h3 class="text-sm font-bold text-slate-900 mt-1">
+                                    Objetivo RTO
+                                </h3>
+                                <p class="text-[11px] text-slate-500 mt-1">
+                                    Restauración máxima
+                                </p>
+                            </div>
+
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                                <i data-lucide="timer" class="w-5 h-5 text-amber-600"></i>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 flex items-end justify-between">
+                            <span class="kpi-number text-amber-600 font-number">4h</span>
+                            <span class="text-[10px] font-bold text-slate-400">RTO</span>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- RESUMEN -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+                    <div class="card lg:col-span-2 p-5 sm:p-6">
+
+                        <div class="flex items-start justify-between mb-5">
+                            <div>
+                                <p class="section-title">Panorama de seguridad</p>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Principales componentes evaluados en TecnoMarket S.A.
+                                </p>
+                            </div>
+
+                            <div class="w-9 h-9 rounded-xl bg-sky-50 flex items-center justify-center">
+                                <i data-lucide="activity" class="w-4 h-4 text-sky-600"></i>
+                            </div>
+                        </div>
+
+                        <div class="space-y-5">
+
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-xs font-semibold text-slate-700">
+                                        Protección de la información
+                                    </span>
+                                    <span class="text-xs font-bold text-sky-600">85%</span>
+                                </div>
+                                <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full w-[85%] bg-sky-500 rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-xs font-semibold text-slate-700">
+                                        Gestión de activos
+                                    </span>
+                                    <span class="text-xs font-bold text-emerald-600">90%</span>
+                                </div>
+                                <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full w-[90%] bg-emerald-500 rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-xs font-semibold text-slate-700">
+                                        Gestión de riesgos
+                                    </span>
+                                    <span class="text-xs font-bold text-amber-600">70%</span>
+                                </div>
+                                <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full w-[70%] bg-amber-500 rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-xs font-semibold text-slate-700">
+                                        Continuidad operativa
+                                    </span>
+                                    <span class="text-xs font-bold text-indigo-600">80%</span>
+                                </div>
+                                <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full w-[80%] bg-indigo-500 rounded-full"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="card p-5 sm:p-6">
+
+                        <p class="section-title">Distribución de riesgos</p>
+                        <p class="text-xs text-slate-500 mt-1 mb-3">
+                            Estado actual de los riesgos identificados
+                        </p>
+
+                        <div class="relative h-56">
+                            <canvas id="riskDoughnutChart"></canvas>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACCESOS RÁPIDOS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    <button onclick="switchTab('seguridad')"
+                        class="card p-5 text-left group">
+                        <div class="flex items-center justify-between">
+                            <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center">
+                                <i data-lucide="shield-check" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-400 group-hover:text-blue-600"></i>
+                        </div>
+                        <h3 class="mt-4 text-sm font-bold text-slate-900">
+                            Principios de seguridad
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Confidencialidad, integridad, disponibilidad y mecanismos de protección.
+                        </p>
+                    </button>
+
+
+                    <button onclick="switchTab('iso')"
+                        class="card p-5 text-left group">
+                        <div class="flex items-center justify-between">
+                            <div class="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center">
+                                <i data-lucide="badge-check" class="w-5 h-5 text-indigo-600"></i>
+                            </div>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-400 group-hover:text-indigo-600"></i>
+                        </div>
+                        <h3 class="mt-4 text-sm font-bold text-slate-900">
+                            ISO/IEC 27001
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Buenas prácticas y controles aplicados al contexto de la organización.
+                        </p>
+                    </button>
+
+
+                    <button onclick="switchTab('plan')"
+                        class="card p-5 text-left group">
+                        <div class="flex items-center justify-between">
+                            <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center">
+                                <i data-lucide="clipboard-check" class="w-5 h-5 text-emerald-600"></i>
+                            </div>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-400 group-hover:text-emerald-600"></i>
+                        </div>
+                        <h3 class="mt-4 text-sm font-bold text-slate-900">
+                            Plan de acción
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Controles, responsables, prioridades y acciones para reducir los riesgos.
+                        </p>
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- EMPRESA -->
+            <!-- ================================================= -->
+            <section id="tab-empresa" class="tab-content space-y-5 hidden">
+
+                <div class="card p-6 bg-gradient-to-r from-white to-sky-50/60">
+
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                        <div>
+                            <span class="inline-flex px-3 py-1 rounded-full bg-sky-100 text-sky-700 text-[9px] font-bold uppercase tracking-wider">
+                                Perfil institucional
+                            </span>
+
+                            <h2 class="text-2xl font-extrabold text-slate-900 mt-2">
+                                TecnoMarket S.A.
+                            </h2>
+
+                            <p class="text-sm text-slate-600 mt-2 max-w-3xl leading-relaxed">
+                                Empresa dedicada a la comercialización de equipos tecnológicos mediante locales físicos
+                                y una plataforma de comercio electrónico con cobertura nacional.
+                            </p>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <div class="text-center px-5 py-3 rounded-2xl bg-white border border-slate-200">
+                                <p class="text-2xl font-extrabold text-sky-600">60</p>
+                                <p class="text-[9px] uppercase font-bold text-slate-400">Colaboradores</p>
+                            </div>
+
+                            <div class="text-center px-5 py-3 rounded-2xl bg-white border border-slate-200">
+                                <p class="text-2xl font-extrabold text-emerald-600">09</p>
+                                <p class="text-[9px] uppercase font-bold text-slate-400">Áreas</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- ACTIVIDAD / PROCESOS -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+                    <div class="card p-5">
+                        <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center mb-4">
+                            <i data-lucide="shopping-cart" class="w-5 h-5 text-sky-600"></i>
+                        </div>
+                        <p class="section-title">Actividad principal</p>
+                        <p class="text-xs text-slate-600 leading-relaxed mt-2">
+                            Comercialización de laptops, celulares, accesorios y equipos de redes mediante
+                            establecimientos físicos y plataforma e-commerce.
+                        </p>
+                    </div>
+
+                    <div class="card p-5">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-4">
+                            <i data-lucide="workflow" class="w-5 h-5 text-emerald-600"></i>
+                        </div>
+                        <p class="section-title">Procesos principales</p>
+                        <p class="text-xs text-slate-600 leading-relaxed mt-2">
+                            Ventas, atención al cliente, gestión de inventario, compras, logística,
+                            facturación, contabilidad y soporte tecnológico.
+                        </p>
+                    </div>
+
+                    <div class="card p-5">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mb-4">
+                            <i data-lucide="target" class="w-5 h-5 text-indigo-600"></i>
+                        </div>
+                        <p class="section-title">Objetivo del SGSI</p>
+                        <p class="text-xs text-slate-600 leading-relaxed mt-2">
+                            Proteger la información de clientes y transacciones, garantizar la disponibilidad
+                            de los servicios y fortalecer la resiliencia operativa.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- ÁREAS -->
+                <div class="card p-5 sm:p-6">
+
+                    <div class="mb-4">
+                        <p class="section-title">Procesos y áreas involucradas</p>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Áreas organizacionales consideradas dentro del análisis.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <i data-lucide="briefcase-business" class="w-4 h-4 text-sky-600"></i>
+                            <p class="text-[11px] font-bold mt-2">Gerencia General</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <i data-lucide="store" class="w-4 h-4 text-sky-600"></i>
+                            <p class="text-[11px] font-bold mt-2">Ventas</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <i data-lucide="headphones" class="w-4 h-4 text-sky-600"></i>
+                            <p class="text-[11px] font-bold mt-2">Atención al Cliente</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <i data-lucide="warehouse" class="w-4 h-4 text-sky-600"></i>
+                            <p class="text-[11px] font-bold mt-2">Bodega</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <i data-lucide="calculator" class="w-4 h-4 text-sky-600"></i>
+                            <p class="text-[11px] font-bold mt-2">Contabilidad</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <i data-lucide="shopping-bag" class="w-4 h-4 text-sky-600"></i>
+                            <p class="text-[11px] font-bold mt-2">Compras</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <i data-lucide="truck" class="w-4 h-4 text-sky-600"></i>
+                            <p class="text-[11px] font-bold mt-2">Logística</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <i data-lucide="users" class="w-4 h-4 text-sky-600"></i>
+                            <p class="text-[11px] font-bold mt-2">RR. HH.</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                            <i data-lucide="server-cog" class="w-4 h-4 text-sky-600"></i>
+                            <p class="text-[11px] font-bold mt-2">Tecnología / TI</p>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- CLASIFICACIÓN -->
+                <div class="card p-5 sm:p-6">
+
+                    <div class="mb-5">
+                        <p class="section-title">Clasificación de la información</p>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Clasificación según el nivel de sensibilidad y acceso requerido.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+
+                        <div class="p-5 rounded-2xl bg-rose-50 border border-rose-200">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-extrabold text-rose-700 uppercase">Confidencial</span>
+                                <i data-lucide="lock-keyhole" class="w-5 h-5 text-rose-500"></i>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+                                Base de datos de clientes, nómina de sueldos y contratos comerciales.
+                            </p>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-amber-50 border border-amber-200">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-extrabold text-amber-700 uppercase">Restringida</span>
+                                <i data-lucide="file-lock-2" class="w-5 h-5 text-amber-500"></i>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+                                Facturación electrónica, registros contables e información bancaria.
+                            </p>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-sky-50 border border-sky-200">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-extrabold text-sky-700 uppercase">Interna</span>
+                                <i data-lucide="folder-lock" class="w-5 h-5 text-sky-500"></i>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+                                Inventario de mercadería, manuales, procedimientos y documentación interna.
+                            </p>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-emerald-50 border border-emerald-200">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-extrabold text-emerald-700 uppercase">Pública</span>
+                                <i data-lucide="globe-2" class="w-5 h-5 text-emerald-500"></i>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-3 leading-relaxed">
+                                Catálogo de productos, promociones, ofertas y precios publicados en el sitio web.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- ACTIVOS -->
+                <div class="card p-5 sm:p-6">
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+
+                        <div>
+                            <p class="section-title">Inventario de activos tecnológicos</p>
+                            <p class="text-xs text-slate-500 mt-1">
+                                7 activos principales identificados para el SGSI.
+                            </p>
+                        </div>
+
+                        <select id="asset-filter"
+                            onchange="filterAssets()"
+                            class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-sky-200">
+                            <option value="all">Todos los tipos</option>
+                            <option value="Información">Información / Datos</option>
+                            <option value="Software">Software / Aplicaciones</option>
+                            <option value="Servicio">Servicio / Infraestructura</option>
+                        </select>
+
+                    </div>
+
+                    <div id="asset-cards-grid"
+                        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- SEGURIDAD -->
+            <!-- ================================================= -->
+            <section id="tab-seguridad" class="tab-content space-y-5 hidden">
+
+                <div class="card p-6 bg-gradient-to-r from-slate-950 to-blue-950 text-white">
+
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center">
+                            <i data-lucide="shield-check" class="w-6 h-6 text-sky-300"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-[9px] uppercase tracking-widest font-bold text-sky-300">
+                                Seguridad de la información
+                            </p>
+                            <h2 class="text-xl font-extrabold mt-1">
+                                Protección integral de TecnoMarket
+                            </h2>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-300 max-w-3xl leading-relaxed mt-4">
+                        La seguridad se aborda mediante la protección de la confidencialidad,
+                        integridad y disponibilidad de la información, complementada con controles
+                        físicos, lógicos y administrativos.
+                    </p>
+
+                </div>
+
+
+                <!-- CID -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    <div class="card p-5 border-t-4 border-t-rose-500">
+                        <div class="flex justify-between">
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-rose-600">
+                                    C · Confidencialidad
+                                </span>
+                                <h3 class="text-base font-extrabold mt-2">
+                                    Solo acceden los autorizados
+                                </h3>
+                            </div>
+                            <div class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center">
+                                <i data-lucide="lock" class="w-5 h-5 text-rose-500"></i>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-600 mt-4 leading-relaxed">
+                            Restricción del acceso a datos de clientes y registros financieros mediante
+                            roles, contraseñas seguras y controles de acceso.
+                        </p>
+                    </div>
+
+
+                    <div class="card p-5 border-t-4 border-t-amber-500">
+                        <div class="flex justify-between">
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-amber-600">
+                                    I · Integridad
+                                </span>
+                                <h3 class="text-base font-extrabold mt-2">
+                                    Información confiable
+                                </h3>
+                            </div>
+                            <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
+                                <i data-lucide="file-check-2" class="w-5 h-5 text-amber-500"></i>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-600 mt-4 leading-relaxed">
+                            Protección frente a alteraciones no autorizadas en inventarios,
+                            comprobantes tributarios y registros contables.
+                        </p>
+                    </div>
+
+
+                    <div class="card p-5 border-t-4 border-t-emerald-500">
+                        <div class="flex justify-between">
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-emerald-600">
+                                    D · Disponibilidad
+                                </span>
+                                <h3 class="text-base font-extrabold mt-2">
+                                    Servicios disponibles
+                                </h3>
+                            </div>
+                            <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
+                                <i data-lucide="server" class="w-5 h-5 text-emerald-500"></i>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-600 mt-4 leading-relaxed">
+                            Mantener operativos los sistemas POS y e-commerce con un objetivo
+                            de recuperación máximo de 4 horas.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- SEGURIDAD FÍSICA Y LÓGICA -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+                    <div class="card p-6">
+
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-11 h-11 rounded-xl bg-orange-50 flex items-center justify-center">
+                                <i data-lucide="door-closed" class="w-5 h-5 text-orange-600"></i>
+                            </div>
+
+                            <div>
+                                <p class="section-title">Seguridad física</p>
+                                <p class="text-[11px] text-slate-500">
+                                    Protección de instalaciones y equipos
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+
+                            <div class="flex gap-3 p-3 rounded-xl bg-slate-50">
+                                <i data-lucide="camera" class="w-4 h-4 text-orange-500 mt-0.5"></i>
+                                <div>
+                                    <p class="text-xs font-bold">Videovigilancia</p>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">
+                                        Cámaras CCTV en áreas críticas y bodega.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 p-3 rounded-xl bg-slate-50">
+                                <i data-lucide="fingerprint" class="w-4 h-4 text-orange-500 mt-0.5"></i>
+                                <div>
+                                    <p class="text-xs font-bold">Control de acceso</p>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">
+                                        Acceso restringido a bodega y cuarto de servidores.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 p-3 rounded-xl bg-slate-50">
+                                <i data-lucide="zap-off" class="w-4 h-4 text-orange-500 mt-0.5"></i>
+                                <div>
+                                    <p class="text-xs font-bold">Continuidad eléctrica</p>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">
+                                        Uso de UPS para proteger equipos críticos.
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="card p-6">
+
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center">
+                                <i data-lucide="key-round" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+
+                            <div>
+                                <p class="section-title">Seguridad lógica</p>
+                                <p class="text-[11px] text-slate-500">
+                                    Protección de sistemas y datos
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+
+                            <div class="flex gap-3 p-3 rounded-xl bg-slate-50">
+                                <i data-lucide="users-round" class="w-4 h-4 text-blue-500 mt-0.5"></i>
+                                <div>
+                                    <p class="text-xs font-bold">Control por roles</p>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">
+                                        Acceso basado en funciones y mínimo privilegio.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 p-3 rounded-xl bg-slate-50">
+                                <i data-lucide="shield-alert" class="w-4 h-4 text-blue-500 mt-0.5"></i>
+                                <div>
+                                    <p class="text-xs font-bold">Antimalware y EDR</p>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">
+                                        Protección frente a malware y ransomware.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3 p-3 rounded-xl bg-slate-50">
+                                <i data-lucide="key" class="w-4 h-4 text-blue-500 mt-0.5"></i>
+                                <div>
+                                    <p class="text-xs font-bold">MFA y contraseñas seguras</p>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">
+                                        Autenticación reforzada para cuentas críticas.
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- MATRIZ DE ACCESO -->
+                <div class="card p-5 sm:p-6">
+
+                    <div class="mb-4">
+                        <p class="section-title">Matriz de control de accesos</p>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Principio de mínimo privilegio aplicado a los colaboradores.
+                        </p>
+                    </div>
+
+                    <div class="overflow-x-auto scrollbar">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="bg-slate-900 text-white">
+                                    <th class="p-3 rounded-tl-xl">Área / Rol</th>
+                                    <th class="p-3">BBDD Clientes</th>
+                                    <th class="p-3">Inventario</th>
+                                    <th class="p-3">Finanzas</th>
+                                    <th class="p-3 rounded-tr-xl">Servidores / Redes</th>
+                                </tr>
+                            </thead>
+
+                            <tbody class="divide-y divide-slate-200">
+
+                                <tr class="table-row">
+                                    <td class="p-3 font-bold">Gerencia General</td>
+                                    <td class="p-3">Lectura / Reportes</td>
+                                    <td class="p-3">Lectura</td>
+                                    <td class="p-3">
+                                        <span class="px-2 py-1 rounded-lg bg-blue-100 text-blue-700 font-bold">
+                                            Acceso total
+                                        </span>
+                                    </td>
+                                    <td class="p-3 text-slate-400">Sin acceso</td>
+                                </tr>
+
+                                <tr class="table-row">
+                                    <td class="p-3 font-bold">Ventas y Atención</td>
+                                    <td class="p-3">Consulta básica</td>
+                                    <td class="p-3">Consulta stock</td>
+                                    <td class="p-3">Emisión ventas</td>
+                                    <td class="p-3 text-slate-400">Sin acceso</td>
+                                </tr>
+
+                                <tr class="table-row">
+                                    <td class="p-3 font-bold">Bodega y Logística</td>
+                                    <td class="p-3 text-slate-400">Sin acceso</td>
+                                    <td class="p-3">
+                                        <span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-700 font-bold">
+                                            Actualizar stock
+                                        </span>
+                                    </td>
+                                    <td class="p-3 text-slate-400">Sin acceso</td>
+                                    <td class="p-3 text-slate-400">Sin acceso</td>
+                                </tr>
+
+                                <tr class="table-row">
+                                    <td class="p-3 font-bold">Tecnología / TI</td>
+                                    <td class="p-3">Administración</td>
+                                    <td class="p-3">Administración</td>
+                                    <td class="p-3">Soporte técnico</td>
+                                    <td class="p-3">
+                                        <span class="px-2 py-1 rounded-lg bg-slate-900 text-white font-bold">
+                                            Acceso total / Logs
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+
+                <!-- INCIDENTES -->
+                <div class="card p-5 sm:p-6">
+
+                    <div class="mb-5">
+                        <p class="section-title">Respuesta ante incidentes</p>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Flujo de actuación ante eventos de seguridad.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+
+                        <div class="p-4 rounded-xl bg-sky-50 border border-sky-200">
+                            <span class="text-[10px] font-extrabold text-sky-700">01</span>
+                            <h4 class="text-xs font-bold mt-2">Detección</h4>
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Alertas de firewall, EDR o reportes.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                            <span class="text-[10px] font-extrabold text-slate-700">02</span>
+                            <h4 class="text-xs font-bold mt-2">Reporte</h4>
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Notificación al equipo de TI.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
+                            <span class="text-[10px] font-extrabold text-amber-700">03</span>
+                            <h4 class="text-xs font-bold mt-2">Contención</h4>
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Aislamiento y bloqueo.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+                            <span class="text-[10px] font-extrabold text-emerald-700">04</span>
+                            <h4 class="text-xs font-bold mt-2">Recuperación</h4>
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Restauración desde respaldos.
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-indigo-50 border border-indigo-200">
+                            <span class="text-[10px] font-extrabold text-indigo-700">05</span>
+                            <h4 class="text-xs font-bold mt-2">Lecciones aprendidas</h4>
+                            <p class="text-[11px] text-slate-500 mt-1">
+                                Mejoras y capacitación.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- ISO 27001 -->
+            <!-- ================================================= -->
+            <section id="tab-iso" class="tab-content space-y-5 hidden">
+
+                <div class="card p-6 bg-gradient-to-br from-indigo-950 to-slate-950 text-white">
+
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+
+                        <div>
+                            <span class="inline-flex px-3 py-1 rounded-full bg-white/10 border border-white/10 text-[9px] font-bold uppercase tracking-wider text-indigo-200">
+                                Sistema de Gestión
+                            </span>
+
+                            <h2 class="text-2xl font-extrabold mt-3">
+                                ISO/IEC 27001:2022
+                            </h2>
+
+                            <p class="text-xs text-slate-300 mt-2 max-w-2xl leading-relaxed">
+                                Aplicación de buenas prácticas y controles de seguridad para proteger
+                                la información y gestionar los riesgos de TecnoMarket S.A.
+                            </p>
+                        </div>
+
+                        <div class="w-20 h-20 rounded-3xl bg-white/10 border border-white/10 flex items-center justify-center">
+                            <i data-lucide="badge-check" class="w-10 h-10 text-indigo-300"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- OBJETIVOS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    <div class="card p-5">
+                        <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center">
+                            <i data-lucide="lock" class="w-5 h-5 text-sky-600"></i>
+                        </div>
+                        <h3 class="text-sm font-extrabold mt-4">
+                            Proteger
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                            Proteger la información crítica de clientes, empleados y operaciones.
+                        </p>
+                    </div>
+
+                    <div class="card p-5">
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                            <i data-lucide="triangle-alert" class="w-5 h-5 text-amber-600"></i>
+                        </div>
+                        <h3 class="text-sm font-extrabold mt-4">
+                            Gestionar
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                            Identificar, evaluar y tratar los riesgos que afectan a la organización.
+                        </p>
+                    </div>
+
+                    <div class="card p-5">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                            <i data-lucide="refresh-cw" class="w-5 h-5 text-emerald-600"></i>
+                        </div>
+                        <h3 class="text-sm font-extrabold mt-4">
+                            Mejorar
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                            Mantener un proceso continuo de evaluación y mejora de la seguridad.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- CONTROLES -->
+                <div class="card p-5 sm:p-6">
+
+                    <div class="mb-5">
+                        <p class="section-title">Controles y buenas prácticas aplicadas</p>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Ejemplos de controles relacionados con los riesgos identificados.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <div class="p-4 rounded-2xl border border-slate-200 hover:border-sky-300 transition">
+                            <div class="flex gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-sky-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="graduation-cap" class="w-4 h-4 text-sky-600"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-bold text-sky-600">A.6.3</span>
+                                    <h4 class="text-xs font-extrabold mt-1">
+                                        Concienciación de seguridad
+                                    </h4>
+                                    <p class="text-[11px] text-slate-500 mt-1">
+                                        Capacitación continua y simulaciones de phishing.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="p-4 rounded-2xl border border-slate-200 hover:border-sky-300 transition">
+                            <div class="flex gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="bug-off" class="w-4 h-4 text-rose-600"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-bold text-rose-600">A.8.7</span>
+                                    <h4 class="text-xs font-extrabold mt-1">
+                                        Protección contra malware
+                                    </h4>
+                                    <p class="text-[11px] text-slate-500 mt-1">
+                                        EDR, antivirus y respaldos aislados.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="p-4 rounded-2xl border border-slate-200 hover:border-sky-300 transition">
+                            <div class="flex gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="globe" class="w-4 h-4 text-indigo-600"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-bold text-indigo-600">A.8.20</span>
+                                    <h4 class="text-xs font-extrabold mt-1">
+                                        Seguridad en servicios web
+                                    </h4>
+                                    <p class="text-[11px] text-slate-500 mt-1">
+                                        WAF, monitoreo y protección del e-commerce.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="p-4 rounded-2xl border border-slate-200 hover:border-sky-300 transition">
+                            <div class="flex gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="door-open" class="w-4 h-4 text-orange-600"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-bold text-orange-600">A.7.2</span>
+                                    <h4 class="text-xs font-extrabold mt-1">
+                                        Ingreso físico y accesos
+                                    </h4>
+                                    <p class="text-[11px] text-slate-500 mt-1">
+                                        Restricción de acceso a zonas críticas.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="p-4 rounded-2xl border border-slate-200 hover:border-sky-300 transition">
+                            <div class="flex gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="network" class="w-4 h-4 text-emerald-600"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-bold text-emerald-600">A.8.21</span>
+                                    <h4 class="text-xs font-extrabold mt-1">
+                                        Seguridad de servicios de red
+                                    </h4>
+                                    <p class="text-[11px] text-slate-500 mt-1">
+                                        Redundancia y protección de conectividad.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="p-4 rounded-2xl border border-slate-200 hover:border-sky-300 transition">
+                            <div class="flex gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+                                    <i data-lucide="wrench" class="w-4 h-4 text-amber-600"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-bold text-amber-600">A.8.8</span>
+                                    <h4 class="text-xs font-extrabold mt-1">
+                                        Gestión de vulnerabilidades
+                                    </h4>
+                                    <p class="text-[11px] text-slate-500 mt-1">
+                                        Actualización y aplicación periódica de parches.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- RELACIÓN -->
+                <div class="card p-5 sm:p-6">
+
+                    <div class="mb-5">
+                        <p class="section-title">Relación riesgo → control → tratamiento</p>
+                        <p class="text-xs text-slate-500 mt-1">
+                            La gestión de riesgos permite seleccionar controles adecuados.
+                        </p>
+                    </div>
+
+                    <div class="overflow-x-auto scrollbar">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="bg-slate-900 text-white">
+                                    <th class="p-3 text-left rounded-tl-xl">Riesgo</th>
+                                    <th class="p-3 text-left">Control</th>
+                                    <th class="p-3 text-left rounded-tr-xl">Tratamiento</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="iso-table-body" class="divide-y divide-slate-200"></tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- RIESGOS -->
+            <!-- ================================================= -->
+            <section id="tab-riesgos" class="tab-content space-y-5 hidden">
+
+                <!-- ENCABEZADO -->
+                <div class="card p-6">
+
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+
+                        <div>
+                            <span class="inline-flex px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-[9px] font-bold uppercase tracking-wider">
+                                Análisis de riesgos
+                            </span>
+
+                            <h2 class="text-2xl font-extrabold text-slate-900 mt-2">
+                                Matriz de Riesgos 5 × 5
+                            </h2>
+
+                            <p class="text-xs text-slate-500 mt-2">
+                                Selecciona una celda del mapa para filtrar los riesgos correspondientes.
+                            </p>
+                        </div>
+
+                        <button onclick="resetRiskFilter()"
+                            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            Ver todos
+                        </button>
+
+                    </div>
+                </div>
+
+
+                <!-- MAPA + CHART -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+
+                    <div class="card xl:col-span-2 p-5 sm:p-6">
+
+                        <div class="mb-5">
+                            <p class="section-title">Mapa de calor</p>
+                            <p class="text-xs text-slate-500 mt-1">
+                                Probabilidad × Impacto
+                            </p>
+                        </div>
+
+                        <div class="overflow-x-auto">
+
+                            <div class="min-w-[580px]">
+
+                                <div class="grid grid-cols-6 gap-2 text-center">
+
+                                    <div class="p-3 text-[9px] font-bold text-slate-400">
+                                        P \ I
+                                    </div>
+
+                                    <div class="p-3 rounded-xl bg-slate-100 text-xs font-bold">1</div>
+                                    <div class="p-3 rounded-xl bg-slate-100 text-xs font-bold">2</div>
+                                    <div class="p-3 rounded-xl bg-slate-100 text-xs font-bold">3</div>
+                                    <div class="p-3 rounded-xl bg-slate-100 text-xs font-bold">4</div>
+                                    <div class="p-3 rounded-xl bg-slate-100 text-xs font-bold">5</div>
+
+
+                                    <!-- P5 -->
+                                    <div class="p-3 rounded-xl bg-slate-100 text-xs font-bold">5</div>
+
+                                    <div onclick="filterMatrix(5,1)"
+                                         class="risk-cell rounded-xl bg-amber-100 border border-amber-200 text-amber-800 font-bold text-xs">
+                                        R10
+                                    </div>
+
+                                    <div onclick="filterMatrix(5,2)"
+                                         class="risk-cell rounded-xl bg-amber-100 border border-amber-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(5,3)"
+                                         class="risk-cell rounded-xl bg-amber-200 border border-amber-300 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(5,4)"
+                                         class="risk-cell rounded-xl bg-rose-300 border border-rose-400 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(5,5)"
+                                         class="risk-cell rounded-xl bg-rose-500 border border-rose-600 text-white">
+                                        —
+                                    </div>
+
+
+                                    <!-- P4 -->
+                                    <div class="p-3 rounded-xl bg-slate-100 text-xs font-bold">4</div>
+
+                                    <div onclick="filterMatrix(4,1)"
+                                         class="risk-cell rounded-xl bg-emerald-100 border border-emerald-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(4,2)"
+                                         class="risk-cell rounded-xl bg-amber-100 border border-amber-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(4,3)"
+                                         class="risk-cell rounded-xl bg-amber-300 border border-amber-400 text-amber-950 font-bold">
+                                        R6 · R9
+                                    </div>
+
+                                    <div onclick="filterMatrix(4,4)"
+                                         class="risk-cell rounded-xl bg-rose-500 border border-rose-600 text-white font-bold shadow-lg">
+                                        R1
+                                    </div>
+
+                                    <div onclick="filterMatrix(4,5)"
+                                         class="risk-cell rounded-xl bg-rose-600 border border-rose-700 text-white">
+                                        —
+                                    </div>
+
+
+                                    <!-- P3 -->
+                                    <div class="p-3 rounded-xl bg-slate-100 text-xs font-bold">3</div>
+
+                                    <div onclick="filterMatrix(3,1)"
+                                         class="risk-cell rounded-xl bg-emerald-100 border border-emerald-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(3,2)"
+                                         class="risk-cell rounded-xl bg-emerald-100 border border-emerald-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(3,3)"
+                                         class="risk-cell rounded-xl bg-amber-100 border border-amber-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(3,4)"
+                                         class="risk-cell rounded-xl bg-rose-300 border border-rose-400 text-rose-950 font-bold">
+                                        R3 · R5 · R7 · R8
+                                    </div>
+
+                                    <div onclick="filterMatrix(3,5)"
+                                         class="risk-cell rounded-xl bg-rose-600 border border-rose-700 text-white font-bold">
+                                        R2
+                                    </div>
+
+
+                                    <!-- P2 -->
+                                    <div class="p-3 rounded-xl bg-slate-100 text-xs font-bold">2</div>
+
+                                    <div onclick="filterMatrix(2,1)"
+                                         class="risk-cell rounded-xl bg-emerald-100 border border-emerald-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(2,2)"
+                                         class="risk-cell rounded-xl bg-emerald-100 border border-emerald-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(2,3)"
+                                         class="risk-cell rounded-xl bg-emerald-100 border border-emerald-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(2,4)"
+                                         class="risk-cell rounded-xl bg-amber-300 border border-amber-400 text-amber-950 font-bold">
+                                        R4
+                                    </div>
+
+                                    <div onclick="filterMatrix(2,5)"
+                                         class="risk-cell rounded-xl bg-rose-300 border border-rose-400 text-slate-400">
+                                        —
+                                    </div>
+
+
+                                    <!-- P1 -->
+                                    <div class="p-3 rounded-xl bg-slate-100 text-xs font-bold">1</div>
+
+                                    <div onclick="filterMatrix(1,1)"
+                                         class="risk-cell rounded-xl bg-emerald-100 border border-emerald-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(1,2)"
+                                         class="risk-cell rounded-xl bg-emerald-100 border border-emerald-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(1,3)"
+                                         class="risk-cell rounded-xl bg-emerald-200 border border-emerald-300 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(1,4)"
+                                         class="risk-cell rounded-xl bg-amber-100 border border-amber-200 text-slate-400">
+                                        —
+                                    </div>
+
+                                    <div onclick="filterMatrix(1,5)"
+                                         class="risk-cell rounded-xl bg-amber-200 border border-amber-300 text-slate-400">
+                                        —
+                                    </div>
+
+                                </div>
+
+                                <div class="flex justify-center mt-4">
+                                    <div class="flex flex-wrap justify-center gap-3 text-[10px] font-semibold">
+
+                                        <span class="flex items-center gap-1.5">
+                                            <span class="w-3 h-3 rounded bg-emerald-300"></span>
+                                            Bajo
+                                        </span>
+
+                                        <span class="flex items-center gap-1.5">
+                                            <span class="w-3 h-3 rounded bg-amber-300"></span>
+                                            Medio
+                                        </span>
+
+                                        <span class="flex items-center gap-1.5">
+                                            <span class="w-3 h-3 rounded bg-orange-400"></span>
+                                            Alto
+                                        </span>
+
+                                        <span class="flex items-center gap-1.5">
+                                            <span class="w-3 h-3 rounded bg-rose-500"></span>
+                                            Crítico
+                                        </span>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- CHART -->
+                    <div class="card p-5 sm:p-6">
+
+                        <p class="section-title">Distribución por nivel</p>
+
+                        <p class="text-xs text-slate-500 mt-1">
+                            Total de riesgos evaluados
+                        </p>
+
+                        <div class="relative h-64 mt-3">
+                            <canvas id="riskBarChart"></canvas>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 mt-3">
+
+                            <div class="text-center p-2 rounded-xl bg-rose-50">
+                                <p class="text-lg font-extrabold text-rose-600">3</p>
+                                <p class="text-[9px] font-bold text-slate-500">CRÍTICOS</p>
+                            </div>
+
+                            <div class="text-center p-2 rounded-xl bg-orange-50">
+                                <p class="text-lg font-extrabold text-orange-600">6</p>
+                                <p class="text-[9px] font-bold text-slate-500">ALTOS</p>
+                            </div>
+
+                            <div class="text-center p-2 rounded-xl bg-amber-50">
+                                <p class="text-lg font-extrabold text-amber-600">1</p>
+                                <p class="text-[9px] font-bold text-slate-500">MEDIO</p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TABLA -->
+                <div class="card p-5 sm:p-6">
+
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-5">
+
+                        <div>
+                            <p id="risk-table-title" class="section-title">
+                                Listado de 10 riesgos evaluados
+                            </p>
+                            <p class="text-xs text-slate-500 mt-1">
+                                Consulta el detalle de cada riesgo.
+                            </p>
+                        </div>
+
+                        <div class="relative w-full lg:w-72">
+                            <i data-lucide="search"
+                               class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+
+                            <input type="text"
+                                   id="risk-search-input"
+                                   onkeyup="searchRisks()"
+                                   placeholder="Buscar riesgo..."
+                                   class="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-xs outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-400">
+                        </div>
+
+                    </div>
+
+                    <div class="overflow-x-auto scrollbar">
+
+                        <table class="w-full text-left text-xs min-w-[900px]">
+
+                            <thead>
+                                <tr class="bg-slate-900 text-white">
+
+                                    <th class="p-3 rounded-tl-xl">ID</th>
+                                    <th class="p-3">Riesgo / Amenaza</th>
+                                    <th class="p-3">Vulnerabilidad</th>
+                                    <th class="p-3 text-center">Prob.</th>
+                                    <th class="p-3 text-center">Imp.</th>
+                                    <th class="p-3 text-center">P × I</th>
+                                    <th class="p-3">Nivel</th>
+                                    <th class="p-3 text-center rounded-tr-xl">Detalle</th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody id="risk-table-body"
+                                   class="divide-y divide-slate-200">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- PLAN -->
+            <!-- ================================================= -->
+            <section id="tab-plan" class="tab-content space-y-5 hidden">
+
+                <div class="card p-6 bg-gradient-to-r from-emerald-950 to-slate-950 text-white">
+
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+
+                        <div>
+                            <span class="inline-flex px-3 py-1 rounded-full bg-emerald-400/10 border border-emerald-300/10 text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+                                Tratamiento de riesgos
+                            </span>
+
+                            <h2 class="text-2xl font-extrabold mt-3">
+                                Plan de acción y mitigación
+                            </h2>
+
+                            <p class="text-xs text-slate-300 mt-2 max-w-2xl leading-relaxed">
+                                Acciones propuestas para reducir la probabilidad o el impacto de los riesgos
+                                identificados.
+                            </p>
+                        </div>
+
+                        <div class="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center">
+                            <i data-lucide="clipboard-check" class="w-7 h-7 text-emerald-300"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PRIORIDADES -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+                    <div class="card p-5">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] uppercase font-bold text-slate-500">
+                                Acciones totales
+                            </span>
+                            <i data-lucide="list-checks" class="w-4 h-4 text-sky-600"></i>
+                        </div>
+                        <p class="text-3xl font-extrabold text-slate-900 mt-3">
+                            10
+                        </p>
+                    </div>
+
+                    <div class="card p-5">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] uppercase font-bold text-slate-500">
+                                Prioridad alta
+                            </span>
+                            <i data-lucide="arrow-up" class="w-4 h-4 text-rose-600"></i>
+                        </div>
+                        <p class="text-3xl font-extrabold text-rose-600 mt-3">
+                            6
+                        </p>
+                    </div>
+
+                    <div class="card p-5">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] uppercase font-bold text-slate-500">
+                                Prioridad media
+                            </span>
+                            <i data-lucide="minus" class="w-4 h-4 text-amber-600"></i>
+                        </div>
+                        <p class="text-3xl font-extrabold text-amber-600 mt-3">
+                            4
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- TABLA PLAN -->
+                <div class="card p-5 sm:p-6">
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+
+                        <div>
+                            <p class="section-title">
+                                Acciones de mitigación
+                            </p>
+                            <p class="text-xs text-slate-500 mt-1">
+                                Controles ISO/IEC 27001 propuestos y responsables.
+                            </p>
+                        </div>
+
+                        <select id="priority-filter"
+                            onchange="filterPlan()"
+                            class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-sky-200">
+
+                            <option value="all">Todas las prioridades</option>
+                            <option value="Alta">Prioridad alta</option>
+                            <option value="Media">Prioridad media</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="overflow-x-auto scrollbar">
+
+                        <table class="w-full text-left text-xs min-w-[950px]">
+
+                            <thead>
+                                <tr class="bg-slate-900 text-white">
+
+                                    <th class="p-3 rounded-tl-xl">Riesgo identificado</th>
+                                    <th class="p-3">Control propuesto</th>
+                                    <th class="p-3">Acción de mitigación</th>
+                                    <th class="p-3">Responsable</th>
+                                    <th class="p-3 rounded-tr-xl">Prioridad</th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody id="plan-table-body"
+                                   class="divide-y divide-slate-200">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <!-- FOOTER -->
+        <footer class="border-t border-slate-200 bg-white px-5 py-5">
+
+            <div class="max-w-[1500px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-white"></i>
+                    </div>
+
+                    <p class="text-[10px] font-bold text-slate-700">
+                        TecnoMarket S.A. · SGSI
+                    </p>
+                </div>
+
+                <p class="text-[10px] text-slate-400 text-center">
+                    © 2026 · Dashboard de Seguridad de la Información · UNEMI
+                </p>
+
+            </div>
+
+        </footer>
+
+    </div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- MODAL DE RIESGO -->
+<!-- ============================================================= -->
+<div id="risk-modal"
+     class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm p-4 items-center justify-center modal-bg">
+
+    <div class="modal-card bg-white rounded-3xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto scrollbar">
+
+        <div class="p-6">
+
+            <div class="flex items-start justify-between gap-4 border-b border-slate-100 pb-5">
+
+                <div>
+                    <span id="modal-risk-id"
+                          class="inline-flex px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-[10px] font-extrabold">
+                        R1
+                    </span>
+
+                    <h3 id="modal-risk-title"
+                        class="text-xl font-extrabold text-slate-900 mt-2">
+                        Nombre del riesgo
+                    </h3>
+                </div>
+
+                <button onclick="closeRiskModal()"
+                        class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+
+            </div>
+
+
+            <div class="space-y-5 mt-5">
+
+                <div>
+                    <p class="text-[10px] uppercase font-bold text-slate-400">
+                        Amenaza identificada
+                    </p>
+
+                    <p id="modal-risk-threat"
+                       class="text-sm font-semibold text-slate-800 mt-1">
+                        -
+                    </p>
+                </div>
+
+
+                <div>
+                    <p class="text-[10px] uppercase font-bold text-slate-400">
+                        Vulnerabilidad asociada
+                    </p>
+
+                    <p id="modal-risk-vuln"
+                       class="text-sm font-semibold text-slate-800 mt-1">
+                        -
+                    </p>
+                </div>
+
+
+                <div class="grid grid-cols-3 gap-3">
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                        <p class="text-[9px] uppercase font-bold text-slate-400">
+                            Probabilidad
+                        </p>
+                        <p id="modal-risk-p"
+                           class="text-2xl font-extrabold text-slate-900 mt-1">
+                            4
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                        <p class="text-[9px] uppercase font-bold text-slate-400">
+                            Impacto
+                        </p>
+                        <p id="modal-risk-i"
+                           class="text-2xl font-extrabold text-slate-900 mt-1">
+                            4
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-100">
+                        <p class="text-[9px] uppercase font-bold text-rose-400">
+                            Nivel
+                        </p>
+                        <p id="modal-risk-level"
+                           class="text-sm font-extrabold text-rose-600 mt-2">
+                            Crítico
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200">
+
+                    <p class="text-[10px] uppercase font-bold text-sky-600">
+                        Control propuesto
+                    </p>
+
+                    <p id="modal-risk-control"
+                       class="text-sm font-bold text-sky-900 mt-1">
+                        -
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <p class="text-[10px] uppercase font-bold text-slate-400">
+                        Acción de mitigación
+                    </p>
+
+                    <p id="modal-risk-action"
+                       class="text-sm text-slate-700 mt-1 leading-relaxed">
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="grid grid-cols-2 gap-3">
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                        <p class="text-[9px] uppercase font-bold text-slate-400">
+                            Responsable
+                        </p>
+                        <p id="modal-risk-resp"
+                           class="text-xs font-bold text-slate-800 mt-1">
+                            -
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                        <p class="text-[9px] uppercase font-bold text-slate-400">
+                            Prioridad
+                        </p>
+                        <p id="modal-risk-priority"
+                           class="text-xs font-bold text-slate-800 mt-1">
+                            -
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="border-t border-slate-100 mt-6 pt-5 flex justify-end">
+
+                <button onclick="closeRiskModal()"
+                    class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition">
+                    Cerrar detalle
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+
+    /* ============================================================
+       DATOS
+    ============================================================ */
+
+    const assets = [
+        {
+            id: 1,
+            name: "Base de Datos de Clientes",
+            type: "Información",
+            desc: "Datos personales, direcciones, teléfonos e historial comercial.",
+            imp: "Alta"
+        },
+        {
+            id: 2,
+            name: "Sistema de Ventas POS",
+            type: "Software",
+            desc: "Software de facturación y punto de venta utilizado en los locales.",
+            imp: "Alta"
+        },
+        {
+            id: 3,
+            name: "Sistema de Inventario",
+            type: "Software",
+            desc: "Control del stock de mercadería tecnológica almacenada en bodega.",
+            imp: "Alta"
+        },
+        {
+            id: 4,
+            name: "Facturación Electrónica",
+            type: "Software",
+            desc: "Emisión de comprobantes digitales exigidos por la normativa.",
+            imp: "Alta"
+        },
+        {
+            id: 5,
+            name: "Página Web E-Commerce",
+            type: "Servicio",
+            desc: "Plataforma de ventas en línea y procesamiento de pedidos.",
+            imp: "Alta"
+        },
+        {
+            id: 6,
+            name: "Servidor Central y Red Wi-Fi",
+            type: "Servicio",
+            desc: "Infraestructura tecnológica y conectividad de los colaboradores.",
+            imp: "Crítica"
+        },
+        {
+            id: 7,
+            name: "Copias de Seguridad Cloud",
+            type: "Servicio",
+            desc: "Respaldos diarios cifrados almacenados en la nube.",
+            imp: "Alta"
+        }
+    ];
+
+
+    const risks = [
+
+        {
+            id: "R1",
+            name: "Ataque de Phishing a Empleados",
+            threat: "Suplantación de identidad por correo electrónico",
+            vuln: "Personal de Ventas/Bodega no capacitado",
+            p: 4,
+            i: 4,
+            level: "Crítico",
+            control: "A.6.3 Concienciación de Seguridad",
+            action: "Capacitaciones continuas y simulacros de phishing",
+            resp: "RR.HH. / TI",
+            priority: "Alta"
+        },
+
+        {
+            id: "R2",
+            name: "Infección por Ransomware",
+            threat: "Malware cifrador de archivos de base de datos",
+            vuln: "Antivirus o parches desactualizados",
+            p: 3,
+            i: 5,
+            level: "Crítico",
+            control: "A.8.7 Protección Contra Malware",
+            action: "Implementar EDR y backups aislados 3-2-1",
+            resp: "TI",
+            priority: "Alta"
+        },
+
+        {
+            id: "R3",
+            name: "Ataque DDoS/SQLi a la Web",
+            threat: "Denegación de servicio o caída web e-commerce",
+            vuln: "Ausencia de Web Application Firewall (WAF)",
+            p: 3,
+            i: 4,
+            level: "Alto",
+            control: "A.8.20 Seguridad en Servicios Web",
+            action: "Configurar WAF y monitoreo continuo",
+            resp: "TI",
+            priority: "Alta"
+        },
+
+        {
+            id: "R4",
+            name: "Robo Físico de Equipos",
+            threat: "Intrusión en bodega o cuarto de servidores",
+            vuln: "Controles de acceso físico deficientes",
+            p: 2,
+            i: 4,
+            level: "Alto",
+            control: "A.7.2 Ingreso Físico y Accesos",
+            action: "Instalar biometría y cámaras CCTV",
+            resp: "Gerencia / TI",
+            priority: "Media"
+        },
+
+        {
+            id: "R5",
+            name: "Falla de Hardware en Servidor",
+            threat: "Daño eléctrico o de disco en servidor local",
+            vuln: "Falta de servidor secundario redundante",
+            p: 3,
+            i: 4,
+            level: "Alto",
+            control: "A.8.14 Redundancia de Instalaciones",
+            action: "Adquisición de servidor secundario y UPS",
+            resp: "TI",
+            priority: "Alta"
+        },
+
+        {
+            id: "R6",
+            name: "Corte del Enlace de Internet",
+            threat: "Caída del proveedor de servicio ISP",
+            vuln: "Disponer de una sola línea de conexión",
+            p: 4,
+            i: 3,
+            level: "Alto",
+            control: "A.8.21 Redundancia en Redes",
+            action: "Contratar enlace redundante con segundo ISP",
+            resp: "TI",
+            priority: "Media"
+        },
+
+        {
+            id: "R7",
+            name: "Fuga de Datos por Cuentas Compartidas",
+            threat: "Exfiltración no autorizada de base de clientes",
+            vuln: "Uso de credenciales genéricas en grupo",
+            p: 3,
+            i: 4,
+            level: "Alto",
+            control: "A.5.15 Control de Acceso",
+            action: "Eliminar usuarios compartidos e implantar MFA",
+            resp: "TI",
+            priority: "Alta"
+        },
+
+        {
+            id: "R8",
+            name: "Caída de Facturación Electrónica",
+            threat: "Falla de firma digital o servidor tributario",
+            vuln: "Dependencia de proceso automatizado único",
+            p: 3,
+            i: 4,
+            level: "Alto",
+            control: "A.8.14 Continuidad Operativa TI",
+            action: "Procedimiento manual de contingencia temporal",
+            resp: "Contabilidad / TI",
+            priority: "Alta"
+        },
+
+        {
+            id: "R9",
+            name: "Sistemas Operativos Sin Parches",
+            threat: "Explotación de fallas conocidas de SO",
+            vuln: "Falta de política automatizada de parches",
+            p: 4,
+            i: 3,
+            level: "Alto",
+            control: "A.8.8 Gestión de Vulnerabilidades",
+            action: "Programar actualización semanal de parches",
+            resp: "TI",
+            priority: "Media"
+        },
+
+        {
+            id: "R10",
+            name: "Errores Humanos de Registro",
+            threat: "Inconsistencia de stock durante inventario",
+            vuln: "Procedimientos no estandarizados en papel",
+            p: 5,
+            i: 1,
+            level: "Medio",
+            control: "A.5.37 Procedimientos Documentados",
+            action: "Fórmulas de control y plantillas estandarizadas",
+            resp: "Bodega",
+            priority: "Media"
+        }
+
+    ];
+
+
+    /* ============================================================
+       NAVEGACIÓN
+    ============================================================ */
+
+    const sectionInfo = {
+
+        bienvenida: {
+            title: "Dashboard principal",
+            subtitle: "Resumen general de seguridad y gestión de riesgos"
+        },
+
+        empresa: {
+            title: "Empresa y activos tecnológicos",
+            subtitle: "Información institucional, procesos, clasificación y activos"
+        },
+
+        seguridad: {
+            title: "Seguridad de la información",
+            subtitle: "Confidencialidad, integridad, disponibilidad y controles"
+        },
+
+        iso: {
+            title: "ISO/IEC 27001:2022",
+            subtitle: "Buenas prácticas y controles de seguridad aplicados"
+        },
+
+        riesgos: {
+            title: "Gestión de riesgos",
+            subtitle: "Matriz 5 × 5 y evaluación de los riesgos identificados"
+        },
+
+        plan: {
+            title: "Plan de acción y mitigación",
+            subtitle: "Controles, responsables, prioridades y acciones"
+        }
+
+    };
+
+
+    function toggleMobileSidebar() {
+
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("mobile-overlay");
+
+        sidebar.classList.toggle("mobile-open");
+        overlay.classList.toggle("hidden");
+
+    }
+
+
+    function switchTab(tabKey) {
+
+        document.querySelectorAll(".tab-content")
+            .forEach(section => section.classList.add("hidden"));
+
+        document.querySelectorAll(".nav-btn")
+            .forEach(btn => {
+                btn.classList.remove("sidebar-active");
+                btn.classList.add("text-slate-300");
+            });
+
+        const selectedSection = document.getElementById(`tab-${tabKey}`);
+        const selectedButton = document.getElementById(`btn-${tabKey}`);
+
+        if (selectedSection) {
+            selectedSection.classList.remove("hidden");
+        }
+
+        if (selectedButton) {
+            selectedButton.classList.add("sidebar-active");
+            selectedButton.classList.remove("text-slate-300");
+        }
+
+        document.getElementById("section-title").textContent =
+            sectionInfo[tabKey].title;
+
+        document.getElementById("section-subtitle").textContent =
+            sectionInfo[tabKey].subtitle;
+
+        if (window.innerWidth < 768) {
+
+            document.getElementById("sidebar").classList.remove("mobile-open");
+            document.getElementById("mobile-overlay").classList.add("hidden");
+
+        }
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+
+
+    /* ============================================================
+       ACTIVOS
+    ============================================================ */
+
+    function renderAssets(data) {
+
+        const grid = document.getElementById("asset-cards-grid");
+
+        grid.innerHTML = "";
+
+        data.forEach(asset => {
+
+            let icon = "database";
+            let color = "sky";
+
+            if (asset.type === "Software") {
+                icon = "code-2";
+                color = "indigo";
+            }
+
+            if (asset.type === "Servicio") {
+                icon = "server";
+                color = "emerald";
+            }
+
+            const impactClass =
+                asset.imp === "Crítica"
+                ? "bg-rose-100 text-rose-700 border-rose-200"
+                : "bg-emerald-100 text-emerald-700 border-emerald-200";
+
+            grid.innerHTML += `
+
+                <div class="group p-5 rounded-2xl border border-slate-200 bg-white hover:border-${color}-300 hover:shadow-lg transition">
+
+                    <div class="flex items-start justify-between gap-3">
+
+                        <div class="w-10 h-10 rounded-xl bg-${color}-50 flex items-center justify-center shrink-0">
+                            <i data-lucide="${icon}" class="w-5 h-5 text-${color}-600"></i>
+                        </div>
+
+                        <span class="text-[9px] font-bold uppercase px-2 py-1 rounded-lg bg-slate-100 text-slate-600">
+                            ${asset.type}
+                        </span>
+
+                    </div>
+
+                    <h3 class="text-sm font-extrabold text-slate-900 mt-4">
+                        ${asset.name}
+                    </h3>
+
+                    <p class="text-[11px] text-slate-500 mt-2 leading-relaxed">
+                        ${asset.desc}
+                    </p>
+
+                    <div class="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
+
+                        <span class="text-[9px] font-bold uppercase text-slate-400">
+                            Impacto
+                        </span>
+
+                        <span class="text-[9px] font-extrabold px-2.5 py-1 rounded-full border ${impactClass}">
+                            ${asset.imp}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        });
+
+        lucide.createIcons();
+
+    }
+
+
+    function filterAssets() {
+
+        const value = document.getElementById("asset-filter").value;
+
+        if (value === "all") {
+            renderAssets(assets);
+            return;
+        }
+
+        renderAssets(
+            assets.filter(asset => asset.type === value)
+        );
+
+    }
+
+
+    /* ============================================================
+       RIESGOS
+    ============================================================ */
+
+    function getRiskBadge(level) {
+
+        if (level === "Crítico") {
+
+            return `
+                <span class="inline-flex px-2.5 py-1 rounded-full bg-rose-500 text-white text-[9px] font-extrabold">
+                    CRÍTICO
+                </span>
+            `;
+
+        }
+
+        if (level === "Alto") {
+
+            return `
+                <span class="inline-flex px-2.5 py-1 rounded-full bg-orange-100 text-orange-700 border border-orange-200 text-[9px] font-extrabold">
+                    ALTO
+                </span>
+            `;
+
+        }
+
+        return `
+            <span class="inline-flex px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200 text-[9px] font-extrabold">
+                MEDIO
+            </span>
+        `;
+
+    }
+
+
+    function renderRisks(data) {
+
+        const tbody = document.getElementById("risk-table-body");
+
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="p-10 text-center">
+                        <div class="flex flex-col items-center">
+                            <i data-lucide="search-x" class="w-8 h-8 text-slate-300"></i>
+                            <p class="text-sm font-bold text-slate-500 mt-3">
+                                No se encontraron riesgos
+                            </p>
+                            <p class="text-xs text-slate-400 mt-1">
+                                Intenta con otro término de búsqueda.
+                            </p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            lucide.createIcons();
+            return;
+        }
+
+
+        data.forEach(risk => {
+
+            const score = risk.p * risk.i;
+
+            tbody.innerHTML += `
+
+                <tr class="table-row border-b border-slate-100">
+
+                    <td class="p-3">
+                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-slate-700 font-extrabold text-[10px]">
+                            ${risk.id}
+                        </span>
+                    </td>
+
+                    <td class="p-3">
+                        <p class="font-bold text-slate-900">
+                            ${risk.name}
+                        </p>
+                        <p class="text-[10px] text-slate-400 mt-1">
+                            ${risk.threat}
+                        </p>
+                    </td>
+
+                    <td class="p-3 text-slate-600 max-w-xs">
+                        ${risk.vuln}
+                    </td>
+
+                    <td class="p-3 text-center">
+                        <span class="font-extrabold text-slate-900">
+                            ${risk.p}
+                        </span>
+                    </td>
+
+                    <td class="p-3 text-center">
+                        <span class="font-extrabold text-slate-900">
+                            ${risk.i}
+                        </span>
+                    </td>
+
+                    <td class="p-3 text-center">
+                        <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-sky-50 text-sky-700 font-extrabold">
+                            ${score}
+                        </span>
+                    </td>
+
+                    <td class="p-3">
+                        ${getRiskBadge(risk.level)}
+                    </td>
+
+                    <td class="p-3 text-center">
+
+                        <button onclick="openRiskModal('${risk.id}')"
+                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-[10px] font-bold transition">
+
+                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                            Ver detalle
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+
+        lucide.createIcons();
+
+    }
+
+
+    function searchRisks() {
+
+        const query =
+            document.getElementById("risk-search-input")
+            .value
+            .toLowerCase()
+            .trim();
+
+        const filtered = risks.filter(risk =>
+            risk.id.toLowerCase().includes(query) ||
+            risk.name.toLowerCase().includes(query) ||
+            risk.threat.toLowerCase().includes(query) ||
+            risk.vuln.toLowerCase().includes(query) ||
+            risk.level.toLowerCase().includes(query)
+        );
+
+        document.getElementById("risk-table-title").textContent =
+            query
+            ? `Resultados de búsqueda (${filtered.length})`
+            : "Listado de 10 riesgos evaluados";
+
+        renderRisks(filtered);
+
+    }
+
+
+    function filterMatrix(probability, impact) {
+
+        const filtered = risks.filter(
+            risk =>
+                risk.p === probability &&
+                risk.i === impact
+        );
+
+        document.getElementById("risk-table-title").textContent =
+            `Riesgos filtrados · Probabilidad ${probability} × Impacto ${impact}`;
+
+        document.getElementById("risk-search-input").value = "";
+
+        renderRisks(filtered);
+
+        document.getElementById("risk-table-body")
+            .scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+    }
+
+
+    function resetRiskFilter() {
+
+        document.getElementById("risk-table-title").textContent =
+            "Listado de 10 riesgos evaluados";
+
+        document.getElementById("risk-search-input").value = "";
+
+        renderRisks(risks);
+
+    }
+
+
+    /* ============================================================
+       MODAL
+    ============================================================ */
+
+    function openRiskModal(id) {
+
+        const risk = risks.find(item => item.id === id);
+
+        if (!risk) return;
+
+        document.getElementById("modal-risk-id").textContent = risk.id;
+        document.getElementById("modal-risk-title").textContent = risk.name;
+        document.getElementById("modal-risk-threat").textContent = risk.threat;
+        document.getElementById("modal-risk-vuln").textContent = risk.vuln;
+        document.getElementById("modal-risk-p").textContent = risk.p;
+        document.getElementById("modal-risk-i").textContent = risk.i;
+        document.getElementById("modal-risk-level").textContent = risk.level;
+        document.getElementById("modal-risk-control").textContent = risk.control;
+        document.getElementById("modal-risk-action").textContent = risk.action;
+        document.getElementById("modal-risk-resp").textContent = risk.resp;
+        document.getElementById("modal-risk-priority").textContent = risk.priority;
+
+        const modal = document.getElementById("risk-modal");
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+
+        document.body.style.overflow = "hidden";
+
+    }
+
+
+    function closeRiskModal() {
+
+        const modal = document.getElementById("risk-modal");
+
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+
+        document.body.style.overflow = "";
+
+    }
+
+
+    document.getElementById("risk-modal")
+        .addEventListener("click", function(event) {
+
+            if (event.target === this) {
+                closeRiskModal();
+            }
+
+        });
+
+
+    document.addEventListener("keydown", function(event) {
+
+        if (event.key === "Escape") {
+            closeRiskModal();
+        }
+
+    });
+
+
+    /* ============================================================
+       PLAN
+    ============================================================ */
+
+    function renderPlan(data) {
+
+        const tbody = document.getElementById("plan-table-body");
+
+        tbody.innerHTML = "";
+
+        data.forEach(risk => {
+
+            const priorityClass =
+                risk.priority === "Alta"
+                ? "bg-rose-100 text-rose-700 border-rose-200"
+                : "bg-amber-100 text-amber-700 border-amber-200";
+
+            tbody.innerHTML += `
+
+                <tr class="table-row border-b border-slate-100">
+
+                    <td class="p-3">
+                        <div class="flex items-start gap-2">
+
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-[9px] font-extrabold">
+                                ${risk.id}
+                            </span>
+
+                            <div>
+                                <p class="font-bold text-slate-900">
+                                    ${risk.name}
+                                </p>
+                            </div>
+
+                        </div>
+                    </td>
+
+                    <td class="p-3">
+                        <span class="text-sky-700 font-bold">
+                            ${risk.control}
+                        </span>
+                    </td>
+
+                    <td class="p-3 text-slate-600 leading-relaxed">
+                        ${risk.action}
+                    </td>
+
+                    <td class="p-3">
+                        <span class="font-bold text-slate-700">
+                            ${risk.resp}
+                        </span>
+                    </td>
+
+                    <td class="p-3">
+
+                        <span class="inline-flex px-2.5 py-1 rounded-full border text-[9px] font-extrabold ${priorityClass}">
+                            ${risk.priority.toUpperCase()}
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+
+    }
+
+
+    function filterPlan() {
+
+        const value =
+            document.getElementById("priority-filter").value;
+
+        if (value === "all") {
+            renderPlan(risks);
+            return;
+        }
+
+        renderPlan(
+            risks.filter(risk => risk.priority === value)
+        );
+
+    }
+
+
+    /* ============================================================
+       TABLA ISO
+    ============================================================ */
+
+    function renderISO() {
+
+        const tbody =
+            document.getElementById("iso-table-body");
+
+        tbody.innerHTML = "";
+
+        risks.slice(0, 6).forEach(risk => {
+
+            tbody.innerHTML += `
+
+                <tr class="table-row">
+
+                    <td class="p-3">
+                        <span class="font-bold text-slate-900">
+                            ${risk.id}
+                        </span>
+                        <span class="text-slate-500 ml-1">
+                            ${risk.name}
+                        </span>
+                    </td>
+
+                    <td class="p-3">
+                        <span class="font-bold text-sky-700">
+                            ${risk.control}
+                        </span>
+                    </td>
+
+                    <td class="p-3 text-slate-600">
+                        ${risk.action}
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+
+    }
+
+
+    /* ============================================================
+       GRÁFICOS
+    ============================================================ */
+
+    let doughnutChart;
+    let barChart;
+
+
+    function initCharts() {
+
+        const doughnutCanvas =
+            document.getElementById("riskDoughnutChart");
+
+        if (doughnutCanvas) {
+
+            doughnutChart = new Chart(
+                doughnutCanvas.getContext("2d"),
+                {
+                    type: "doughnut",
+
+                    data: {
+                        labels: [
+                            "Crítico",
+                            "Alto",
+                            "Medio"
+                        ],
+
+                        datasets: [
+                            {
+                                data: [3, 6, 1],
+
+                                backgroundColor: [
+                                    "#e11d48",
+                                    "#f97316",
+                                    "#f59e0b"
+                                ],
+
+                                borderWidth: 3,
+                                borderColor: "#ffffff",
+
+                                hoverOffset: 6
+                            }
+                        ]
+                    },
+
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+
+                        cutout: "68%",
+
+                        plugins: {
+
+                            legend: {
+                                position: "bottom",
+
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 18,
+                                    font: {
+                                        size: 10,
+                                        weight: "600"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+
+        }
+
+
+        const barCanvas =
+            document.getElementById("riskBarChart");
+
+        if (barCanvas) {
+
+            barChart = new Chart(
+                barCanvas.getContext("2d"),
+                {
+                    type: "bar",
+
+                    data: {
+                        labels: [
+                            "Bajo",
+                            "Medio",
+                            "Alto",
+                            "Crítico"
+                        ],
+
+                        datasets: [
+                            {
+                                label: "Cantidad de riesgos",
+                                data: [0, 1, 6, 3],
+
+                                backgroundColor: [
+                                    "#10b981",
+                                    "#f59e0b",
+                                    "#f97316",
+                                    "#e11d48"
+                                ],
+
+                                borderRadius: 8,
+                                borderSkipped: false
+                            }
+                        ]
+                    },
+
+                    options: {
+
+                        responsive: true,
+                        maintainAspectRatio: false,
+
+                        scales: {
+
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    font: {
+                                        size: 10
+                                    }
+                                },
+
+                                grid: {
+                                    color: "#e2e8f0"
+                                }
+                            },
+
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+
+                                ticks: {
+                                    font: {
+                                        size: 10,
+                                        weight: "600"
+                                    }
+                                }
+                            }
+
+                        },
+
+                        plugins: {
+
+                            legend: {
+                                display: false
+                            }
+
+                        }
+
+                    }
+                }
+            );
+
+        }
+
+    }
+
+
+    /* ============================================================
+       INICIALIZACIÓN
+    ============================================================ */
+
+    window.addEventListener("load", function() {
+
+        renderAssets(assets);
+        renderRisks(risks);
+        renderPlan(risks);
+        renderISO();
+
+        initCharts();
+
+        lucide.createIcons();
+
+    });
+
+</script>
+
+</body>
+</html>
